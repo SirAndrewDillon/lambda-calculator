@@ -1,116 +1,64 @@
 import React, { useState } from "react";
-import "./App.css";
-// STEP 4 - import the button and display components
-// Don't forget to import any extra css/scss files you build into the correct component
+import "./normalize.scss";
+import "./app.scss";
 
-// Logo has already been provided for you. Do the same for the remaining components
+import Numbers from "../src/components/ButtonComponents/NumberButtons/Numbers";
+import Operators from "../src/components/ButtonComponents/OperatorButtons/Operators";
+import Specials from "../src/components/ButtonComponents/SpecialButtons/Specials";
+import Display from "../src/components/DisplayComponents/Display";
 import Logo from "./components/DisplayComponents/Logo";
-import Display from "./components/DisplayComponents/Display";
-import Specials from "./components/ButtonComponents/SpecialButtons/Specials";
-import Operators from "./components/ButtonComponents/OperatorButtons/Operators";
-import Numbers from "./components/ButtonComponents/NumberButtons/Numbers";
 
 function App() {
-  // STEP 5 - After you get the components displaying using the provided data file, write your state hooks here.
-  // Once the state hooks are in place write some functions to hold data in state and update that data depending on what it needs to be doing
-  // Your functions should accept a parameter of the the item data being displayed to the DOM (ie - should recieve 5 if the user clicks on
-  // the "5" button, or the operator if they click one of those buttons) and then call your setter function to update state.
-  // Don't forget to pass the functions (and any additional data needed) to the components as props
+  const [display, updateDisplay] = useState("");
 
-  const [a, setA] = useState(null);
-  const [b, setB] = useState(null);
-  const [operator, setOperator] = useState(null);
-  const [displayValue, setDisplayValue] = useState(0);
+  function handleInput(input) {
+    switch (input) {
+      case "C":
+        updateDisplay("");
+        break;
 
-  const calculate = () => {
-    if (a !== null) {
-      if (b !== null) {
-        switch (operator) {
-          case "/":
-            setA(a / b);
-            setDisplayValue(a / b);
-            setB(null);
-            setOperator(null);
-            break;
-          case "x":
-            setA(a * b);
-            setDisplayValue(a * b);
-            setB(null);
-            setOperator(null);
-            break;
-          case "-":
-            setA(a - b);
-            setDisplayValue(a - b);
-            setB(null);
-            setOperator(null);
-            break;
-          case "+":
-            setA(a + b);
-            setDisplayValue(a + b);
-            setB(null);
-            setOperator(null);
-            break;
+      case "+/-":
+        if (!display) {
+          updateDisplay(display);
+        } else {
+          let newDisplay = "";
+          display.slice(0, 1) !== "-"
+            ? (newDisplay = `-${display}`)
+            : (newDisplay = display.slice(1, display.length));
+          updateDisplay(newDisplay);
         }
-      } else {
-        setDisplayValue(a);
-      }
+        break;
+
+      case "%":
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+        updateDisplay(display.concat(input));
+        break;
+
+      case "=":
+        updateDisplay(eval(display).toString());
+        break;
+
+      default:
+        updateDisplay(display.concat(input));
     }
-    console.log("A:", a);
-    console.log("B:", b);
-    console.log("current operator:", operator);
-  };
-
-  const operatorPressed = async op => {
-    if (b != null) {
-      calculate();
-    }
-    // setDisplayValue(a); Pretty sure this line is unneccessary
-    await setOperator(op);
-    console.log("A:", a);
-    console.log("B:", b);
-    console.log("current operator:", operator);
-  };
-
-  const numPressed = num => {
-    const input = parseInt(`${displayValue}${num}`);
-
-    if (b === null && operator && operator !== "=") {
-      setDisplayValue(num);
-      setB(parseInt(num));
-    } else if (operator) {
-      setB(parseInt(input));
-      setDisplayValue(input.toString());
-    } else {
-      setA(parseInt(input));
-      setDisplayValue(input.toString());
-    }
-
-    console.log("A:", a);
-    console.log("B:", b);
-    console.log("current operator:", operator);
-  };
-
-  const clear = () => {
-    setA(null);
-    setB(null);
-    setOperator(null);
-    setDisplayValue("0");
-    console.log("A:", a);
-    console.log("B:", b);
-    console.log("current operator:", operator);
-  };
+  }
 
   return (
     <div className="container">
       <Logo />
-      <Display val={displayValue} />
       <div className="App">
-        <div className="left">
-          <Specials clear={clear} />
-          <Numbers click={numPressed} />
-        </div>
-        <div className="right">
-          <Operators click={operatorPressed} calc={calculate} />
+        <Display display={display} />
+        <div className="button-container">
+          <div className="col-left">
+            <Specials handleInput={handleInput} />
+            <Numbers handleInput={handleInput} />
+          </div>
+          <div className="col-right">
+            <Operators handleInput={handleInput} />
+          </div>
         </div>
       </div>
     </div>

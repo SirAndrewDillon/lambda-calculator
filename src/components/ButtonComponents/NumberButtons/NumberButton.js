@@ -1,11 +1,20 @@
-import React from "react";
+import React from 'react';
+
+
 
 const NumberButton = props => {
-  return (
-    <div onClick={() => props.click(props.num)} className={`number-button ${props.num == 0 ? 'zero' : ''}`}>
-      {props.num}
-    </div>
-  );
-};
-
-export default NumberButton;
+	return (
+	  <>
+		{
+		  <button
+			className="number-button"
+			onClick={() => props.handleInput(props.number)}
+		  >
+			{props.number}
+		  </button>
+		}
+	  </>
+	);
+  };
+  
+  export default NumberButton;
